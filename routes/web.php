@@ -39,6 +39,11 @@ Route::get('/contact', function () {
     ]);
 });
 
+
+// =====================
+//  CAREER & JOB ROUTES (PUBLIC)
+// =====================
+
 // List lowongan
 Route::get('/careers', [JobController::class, 'index'])
     ->name('careers.index');
@@ -47,58 +52,83 @@ Route::get('/careers', [JobController::class, 'index'])
 Route::get('/jobs/{slug}', [JobController::class, 'show'])
     ->name('jobs.show');
 
-// Kirim lamaran (form dari halaman job detail)
+// HALAMAN FORM LAMAR (GET)
+Route::get('/jobs/{slug}/apply', [ApplicationController::class, 'create'])
+    ->name('jobs.apply.form');
+
+// PROSES SIMPAN LAMARAN (POST)
 Route::post('/jobs/{slug}/apply', [ApplicationController::class, 'store'])
-    ->name('applications.store');
+    ->name('jobs.apply');
 
 
 // =====================
-//  PROFILE (USER BIASA, HARUS LOGIN)
+//  PROFILE (HARUS LOGIN)
 // =====================
-Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+Route::middleware(['auth'])->group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit'])
+        ->name('profile.edit');
+
+    Route::patch('/profile', [ProfileController::class, 'update'])
+        ->name('profile.update');
+
+    Route::delete('/profile', [ProfileController::class, 'destroy'])
+        ->name('profile.destroy');
 });
 
 
 // =====================
 //  ADMIN AREA (HARUS LOGIN)
 // =====================
-Route::middleware('auth')->prefix('admin')->group(function () {
+// Instruksi: Tambahkan tepat di bawah middleware admin:
+// Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () { ... });
 
-    // List pelamar + filter
-    Route::get('/applications', [ApplicationController::class, 'index'])
-        ->name('admin.applications.index');
+Route::middleware(['auth'])
+    ->prefix('admin')
+    ->name('admin.')
+    ->group(function () {
 
-    // Export Excel (ikut filter query)
-    Route::get('/applications/export', [ApplicationController::class, 'export'])
-        ->name('admin.applications.export');
+        // ===== APLIKASI / PELAMAR =====
+        // Daftar pelamar
+        Route::get('/applications', [ApplicationController::class, 'index'])
+            ->name('applications.index');
 
-    // Detail pelamar
-    Route::get('/applications/{application}', [ApplicationController::class, 'show'])
-        ->name('admin.applications.show');
+        // Export Excel
+        Route::get('/applications/export', [ApplicationController::class, 'export'])
+            ->name('applications.export');
 
-    // Update status pelamar (submitted/reviewed/accepted/rejected)
-    Route::patch('/applications/{application}/status', [ApplicationController::class, 'updateStatus'])
-        ->name('admin.applications.updateStatus');
+        // Detail pelamar
+        Route::get('/applications/{application}', [ApplicationController::class, 'show'])
+            ->name('applications.show');
 
-    // Update catatan HR
-    Route::patch('/applications/{application}/notes', [ApplicationController::class, 'updateNotes'])
-        ->name('admin.applications.updateNotes');
-});
+        // Update status pelamar
+        Route::patch('/applications/{application}/status', [ApplicationController::class, 'updateStatus'])
+            ->name('applications.updateStatus');
+
+        // Update catatan HR
+        Route::patch('/applications/{application}/notes', [ApplicationController::class, 'updateNotes'])
+            ->name('applications.updateNotes');
+
+        // ===== JOBS (STATUS OPEN/CLOSE) =====
+        // Kelola lowongan (admin jobs list)
+        Route::get('/jobs', [JobController::class, 'adminIndex'])
+            ->name('jobs.index');
+
+        // Update status open/closed
+        Route::patch('/jobs/{job}/status', [JobController::class, 'updateStatus'])
+            ->name('jobs.updateStatus');
+    });
 
 
 // =====================
 //  DASHBOARD (SETELAH LOGIN)
 // =====================
-// Biar habis login langsung ke halaman admin pelamar
 Route::get('/dashboard', function () {
+    // nama route tetap "admin.applications.index"
     return redirect()->route('admin.applications.index');
 })->middleware(['auth'])->name('dashboard');
 
 
 // =====================
-//  AUTH ROUTES DARI BREEZE
+//  ROUTE AUTH BREEZE
 // =====================
 require __DIR__.'/auth.php';

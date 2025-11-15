@@ -2,6 +2,48 @@
 
 @section('content')
 <section class="py-10">
+
+    {{-- HEADER HR DASHBOARD + TAB NAV --}}
+    <header class="mb-8 flex items-center justify-between gap-4">
+        <div class="flex flex-col gap-2">
+            <div class="inline-flex items-center gap-2">
+                <span class="inline-flex items-center justify-center rounded-xl bg-slate-900/80 px-3 py-1 text-[11px] font-semibold tracking-wide text-amber-300 uppercase border border-amber-500/40">
+                    IBINET HR DASHBOARD
+                </span>
+                <span class="inline-flex items-center rounded-full bg-emerald-500/10 px-3 py-1 text-[11px] font-semibold text-emerald-300 border border-emerald-500/40">
+                    ● ADMIN MODE
+                </span>
+            </div>
+
+            <nav class="mt-3 flex flex-wrap items-center gap-3 text-xs font-medium">
+                {{-- TAB: Pelamar (aktif di halaman ini) --}}
+                <a href="{{ route('admin.applications.index') }}"
+                   class="rounded-full px-4 py-2 border
+                          {{ request()->routeIs('admin.applications.index') 
+                                ? 'border-blue-400 bg-blue-500/15 text-blue-100' 
+                                : 'border-slate-700 bg-slate-900/60 text-slate-300 hover:border-blue-400 hover:text-blue-100' }}">
+                    Pelamar
+                </a>
+
+                {{-- TAB: Kelola Lowongan --}}
+                <a href="{{ route('admin.jobs.index') }}"
+                   class="rounded-full px-4 py-2 border
+                          {{ request()->routeIs('admin.jobs.index') 
+                                ? 'border-blue-400 bg-blue-500/15 text-blue-100' 
+                                : 'border-slate-700 bg-slate-900/60 text-slate-300 hover:border-blue-400 hover:text-blue-100' }}">
+                    Kelola Lowongan
+                </a>
+
+                {{-- TAB: Halaman Karier Publik --}}
+                <a href="{{ url('/careers') }}"
+                   class="rounded-full px-4 py-2 border border-slate-700 bg-slate-900/40 text-slate-300 hover:border-emerald-400 hover:text-emerald-200">
+                    Halaman Karier Publik
+                </a>
+            </nav>
+        </div>
+    </header>
+
+    {{-- ========== KONTEN LAMA (TIDAK DIUBAH) ========== --}}
     <div class="mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
         <div>
             <h1 class="text-2xl font-extrabold text-blue-900">

@@ -54,6 +54,22 @@ class ApplicationController extends Controller
     }
 
     /**
+     * HALAMAN FORM LAMARAN berdasarkan slug job
+     */
+    public function create(string $slug)
+    {
+        // Cari job berdasarkan slug dan yang masih open
+        $job = Job::where('slug', $slug)
+            ->where('is_open', true)
+            ->firstOrFail();
+
+        return view('jobs.apply', [
+            'title' => 'Lamar ' . $job->title . ' - IBINET',
+            'job'   => $job,
+        ]);
+    }
+
+    /**
      * Menyimpan lamaran baru berdasarkan slug job
      */
     public function store(Request $request, string $slug)
@@ -85,7 +101,10 @@ class ApplicationController extends Controller
             'notes'   => null,
         ]);
 
-        return back()->with('success', 'Lamaran kamu sudah terkirim ke tim HR IBINET.');
+        // Redirect kembali ke halaman form apply + flash message sukses
+        return redirect()
+            ->route('jobs.apply.form', $job->slug)
+            ->with('success', 'Lamaran kamu sudah terkirim ke tim HR IBINET.');
     }
 
     /**
